@@ -18,7 +18,7 @@ def download( uri, path )
 		size = 0;
 		begin
 			file = open(path, 'wb')
-			http.request_get('/' + uri.path) do |response|
+			http.request_get('/' + URI.encode( uri.path ) ) do |response|
 				response.read_body do |segment|
 					size += segment.length
 					yield size
