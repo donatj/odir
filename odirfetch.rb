@@ -20,12 +20,13 @@ def download( uri, path )
 			file = open(path, 'wb')
 			http.request_get('/' + ( uri.path ) ) do |response|
 				response.read_body do |segment|
-					size += segment.length
-					yield size
+					size += segment.length 
+					yield size, response['content-length'].to_i
 					file.write(segment)
 				end
 			end
 		rescue
+			puts "DOWNLOAD ERROR";
 			if file
 				file.close
 				File.unlink(path)
@@ -33,6 +34,8 @@ def download( uri, path )
 		ensure
 			if file
 				file.close
+			else
+				puts "FILE ERROR"
 			end
 		end
 	end
@@ -66,14 +69,18 @@ files.each do |x|
 	if not downloaded.include? path and not File.exists? path
 		print "\0337"
 
-		download(file, path) do |size|
-			kb = (size / 1000).floor
+		download(file, path) do |size, maxlength|
+			kb      = (size / 1000).floor
+			percent = ((size.to_f / maxlength.to_f) * 100).floor if maxlength 
+			
 			print "\0338"
 			print "Downloading #{path} " + kb.to_s + ' kb'
+			print " #{percent}%" if maxlength
 		end
 
-		puts
-		puts "Done!"
+		puts " - Done!"
 		downloaded.push(path)
 	end
 end
+
+puts "Finished!"
