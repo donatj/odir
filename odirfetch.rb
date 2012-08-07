@@ -25,12 +25,14 @@ def download( uri, path )
 					file.write(segment)
 				end
 			end
+		rescue
+			if file
+				file.close
+				File.unlink(path)
+			end
 		ensure
 			if file
 				file.close
-			else
-				puts 'Invalid file handle ' + path
-				exit
 			end
 		end
 	end
@@ -60,8 +62,8 @@ files.each do |x|
 
 	file = URI.join(uri.to_s, x[0])
 
-	path = dir + lastbit.match( file.path )[0];
-	if not downloaded.include? path
+	path = dir + URI.decode(lastbit.match( file.path )[0]);
+	if not downloaded.include? path and not File.exists? path
 		print "\0337"
 
 		download(file, path) do |size|
