@@ -26,7 +26,12 @@ def download( uri, path )
 				end
 			end
 		ensure
-			file.close
+			if file
+				file.close
+			else
+				puts 'Invalid file handle ' + path
+				exit
+			end
 		end
 	end
 
@@ -39,31 +44,34 @@ if files.length == 0
 	exit 1
 end
 
-if uri.path.to_s =~ /\/([^\/]*?)\/*$/
+lastbit = /\/([^\/]*?)\/*$/;
+
+if uri.path.to_s =~ lastbit
 	dir = "OpenDir " + URI.unescape($~[1])
 else
 	dir = "OpenDir " + Time.now.to_s
 end
 
-Dir.mkdir( dir )
+Dir.mkdir( dir ) if not Dir.exists?( dir )
+
+downloaded = []
 
 files.each do |x|
 
-	file = URI.parse(x[0])
-	if !file.scheme
-		file.scheme = uri.scheme
-		file.host   = uri.host
-		file.path   = (uri.path + '/').gsub(/\/\/$/, '/') + file.path
-		
+	file = URI.join(uri.to_s, x[0])
+
+	path = dir + lastbit.match( file.path )[0];
+	if not downloaded.include? path
 		print "\0337"
 
-		download(file, dir + '/' + x[1]) do |size|
+		download(file, path) do |size|
 			kb = (size / 1000).floor
 			print "\0338"
-			print "Downloading #{x[1]} " + kb.to_s + ' kb'
+			print "Downloading #{path} " + kb.to_s + ' kb'
 		end
 
 		puts
 		puts "Done!"
+		downloaded.push(path)
 	end
 end
