@@ -38,7 +38,7 @@ def download( uri, path )
 			if file
 				file.close
 				if contentlength
-					if contentlength >= File.size(path)
+					if contentlength <= File.size(path)
 						return :success
 					else
 						File.unlink(path)
