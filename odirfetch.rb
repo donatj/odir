@@ -16,17 +16,20 @@ def download( uri, path )
 
 	Net::HTTP.start( uri.host, uri.port ) do |http|
 		size = 0;
+		contentlength = nil
 		begin
 			file = open(path, 'wb')
 			http.request_get('/' + ( uri.path ) ) do |response|
+
+				contentlength = response['content-length'].to_i if response['content-length']
+
 				response.read_body do |segment|
 					size += segment.length 
-					yield size, response['content-length'].to_i
+					yield size, contentlength
 					file.write(segment)
 				end
 			end
 		rescue
-			puts "DOWNLOAD ERROR";
 			if file
 				file.close
 				File.unlink(path)
@@ -34,12 +37,21 @@ def download( uri, path )
 		ensure
 			if file
 				file.close
+				if contentlength
+					if contentlength >= File.size(path)
+						return :success
+					else
+						File.unlink(path)
+						return :error
+					end
+				else
+					return :unconfirmable
+				end
 			else
-				puts "FILE ERROR"
+				return :error
 			end
 		end
 	end
-
 end
 
 files = page.scan(/<a.*?href="([^?][^\/]+?)".*?>(.+?)<\/a>/i)
