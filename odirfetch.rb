@@ -81,16 +81,27 @@ files.each do |x|
 	if not downloaded.include? path and not File.exists? path
 		print "\0337"
 
-		download(file, path) do |size, maxlength|
-			kb      = (size / 1000).floor
-			percent = ((size.to_f / maxlength.to_f) * 100).floor if maxlength 
-			
-			print "\0338"
-			print "Downloading #{path} " + kb.to_s + ' kb'
-			print " #{percent}%" if maxlength
-		end
+		for i in 0..2
 
-		puts " - Done!"
+			result = download(file, path) do |size, maxlength|
+				kb      = (size / 1000).floor
+				percent = ((size.to_f / maxlength.to_f) * 100).floor if maxlength 
+				
+				print "\0338"
+				print "Downloading #{path} " + kb.to_s + ' kb'
+				print " #{percent}%" if maxlength
+			end
+
+			if result != :error
+				puts " - Done!"
+			elsif i < 2
+				puts " - Error Downloading, Retrying"
+			else
+				puts " - Download Failed"
+			end
+				
+
+		end
 		downloaded.push(path)
 	end
 end
