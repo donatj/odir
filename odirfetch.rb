@@ -94,13 +94,12 @@ files.each do |x|
 
 			if result != :error
 				puts " - Done!"
+				break
 			elsif i < 2
 				puts " - Error Downloading, Retrying"
 			else
 				puts " - Download Failed"
 			end
-				
-
 		end
 		downloaded.push(path)
 	end
