@@ -21,10 +21,11 @@ puts "Starting..."
 def download( uri, path )
 
 	Net::HTTP.start( uri.host, uri.port ) do |http|
-		size = 0;
+		irupt         = false
+		size          = 0
 		contentlength = nil
 		begin
-			file = open(path, 'wb')
+			file = File.open(path, 'wb')
 			http.request_get('/' + ( uri.path ) ) do |response|
 
 				contentlength = response['content-length'].to_i if response['content-length']
@@ -35,27 +36,32 @@ def download( uri, path )
 					file.write(segment)
 				end
 			end
-		rescue
-			if file
-				file.close
-				File.unlink(path)
-			end
-		ensure
-			if file
-				# file.close
-				if size
-					if (contentlength and contentlength >= File.size(path)) or File.size(path) > 0
+		rescue SystemExit, Interrupt
+			irupt = true
+		rescue Exception => e
+			# Do Something Here?
+		ensure			
+			if file and File.exists?(path) and not irupt
+				if contentlength
+					if contentlength >= File.size(path)
 						return :success
-					else
-						File.unlink(path)
-						return :error
 					end
 				else
 					return :unconfirmable
 				end
-			else
-				return :error
 			end
+
+			if File.exists?(path)
+				File.unlink(path)
+			end
+
+			if irupt
+				puts ''
+				puts 'User Interrupt'
+				exit
+			end
+
+			return :error
 		end
 	end
 end
