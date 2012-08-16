@@ -8,7 +8,13 @@ raise RuntimeError, 'Please provide a URL as Argument 1' unless ARGV[0] =~ /\Aht
 puts "Scanning..."
 
 uri  = URI.parse(ARGV[0])
-page = Net::HTTP.get( uri )
+
+begin
+	page = Net::HTTP.get( uri )	
+rescue
+	puts "Failed to connect to host"
+	exit
+end
 
 puts "Starting..."
 
@@ -37,8 +43,8 @@ def download( uri, path )
 		ensure
 			if file
 				file.close
-				if contentlength
-					if contentlength <= File.size(path)
+				if size
+					if contentlength >= File.size(path) and 
 						return :success
 					else
 						File.unlink(path)
