@@ -43,7 +43,7 @@ def download( uri, path )
 		ensure			
 			if file and File.exists?(path) and not irupt
 				if contentlength
-					if contentlength >= File.size(path)
+					if contentlength <= File.size(path)
 						return :success
 					end
 				else
