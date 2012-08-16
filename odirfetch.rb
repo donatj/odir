@@ -42,9 +42,9 @@ def download( uri, path )
 			end
 		ensure
 			if file
-				file.close
+				# file.close
 				if size
-					if contentlength >= File.size(path) and 
+					if (contentlength and contentlength >= File.size(path)) or File.size(path) > 0
 						return :success
 					else
 						File.unlink(path)
