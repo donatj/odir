@@ -105,12 +105,12 @@ files.each do |x|
 			end
 
 			if result != :error
-				puts " - Done!"
+				puts "\033[0;32m - Done!\033[0m"
 				break
 			elsif i < 2
-				puts " - Error Downloading, Retrying"
+				puts "\033[0;35m - Error Downloading, Retrying\033[0m"
 			else
-				puts " - Download Failed"
+				puts "\033[0;31m - Download Failed\033[0m"
 			end
 		end
 		downloaded.push(path)
