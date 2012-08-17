@@ -19,7 +19,6 @@ end
 puts "Starting..."
 
 def download( uri, path )
-
 	Net::HTTP.start( uri.host, uri.port ) do |http|
 		irupt         = false
 		size          = 0
@@ -40,14 +39,14 @@ def download( uri, path )
 			irupt = true
 		rescue Exception => e
 			# Do Something Here?
-		ensure			
+		ensure
 			if file and File.exists?(path) and not irupt
 				if contentlength
-					if contentlength <= File.size(path)
-						return :success
+					if contentlength <= size
+						return {'status' => :success, 'contentlength' => contentlength, 'size' => size}
 					end
 				else
-					return :unconfirmable
+					return {'status' => :unconfirmable, 'size' => size}
 				end
 			end
 
@@ -61,7 +60,7 @@ def download( uri, path )
 				exit
 			end
 
-			return :error
+			return {'status' => :error, 'contentlength' => contentlength, 'size' => size}
 		end
 	end
 end
@@ -104,11 +103,13 @@ files.each do |x|
 				print " #{percent}%" if maxlength
 			end
 
-			if result != :error
+			if result['status'] != :error
 				puts "\033[0;32m - Done!\033[0m"
 				break
 			elsif i < 2
 				puts "\033[0;35m - Error Downloading, Retrying\033[0m"
+				print result['msg'] if result['msg']
+				p result
 			else
 				puts "\033[0;31m - Download Failed\033[0m"
 			end
