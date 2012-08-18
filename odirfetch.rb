@@ -4,7 +4,7 @@ require 'net/http'
 require 'uri'
 
 if RUBY_VERSION =~ /^1\.8/
-  require 'compat'
+  require 'compat.rb'
 end
 
 raise RuntimeError, 'Please provide a URL as Argument 1' unless ARGV[0] =~ /\Ahttps?:\/\//i
