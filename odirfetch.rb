@@ -85,6 +85,7 @@ else
 end
 
 Dir.mkdir( dir ) if not Dir.exists?( dir )
+File.open( dir + '/ .txt' , 'w') { |f| f.write( uri.to_s ) }
 
 downloaded = []
 
