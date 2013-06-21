@@ -29,7 +29,7 @@ def download( uri, path )
 		contentlength = nil
 		begin
 			file = File.open(path, 'wb')
-			http.request_get('/' + ( uri.path ) ) do |response|
+			http.request_get(uri.path) do |response|
 
 				contentlength = response['content-length'].to_i if response['content-length']
 
